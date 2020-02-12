@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Qr code generator</title>
+</head>
+<main>
+   <h1>QR code</h1>
+    <div id="Tonen"> </div>
+</main>
+<body>
+    
+<script src="qrcode.js"></script>
+    <script>
+        var t_qr = "objectId of thing"
+        var qrcode = new QRCode("Tonen", {
+            text: t_qr,
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    </script>
+
+</body>
+</html>

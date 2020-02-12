@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <title>QR Code Application</title>
+
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <form id="form">
+                    <div class="form-group">
+                        <p>
+                            <label for="Type">Type</label>
+                            <input type="text" class="form-control" id="typeUserInput" placeholder="Type">
+                        </p>
+                        <p>
+                            <label for="device">Device</label>
+                            <input type="text" class="form-control" id="deviceUserInput" placeholder="Device">
+                        </p>
+                        <p>
+                            <label for="number">Number of new devices</label>
+                            <input type="number" min="0" class="form-control" id="numberUserInput" placeholder="Number">
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create new device</button>
+                </form>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+
+                <h2>Types to choose from:</h2>
+                <ul class="list-group" id="display">
+
+                </ul>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <div class="alert" role="alert" id="message">
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-2"></div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous">
+    </script>
+
+    <script>
+        
+
+        $(document).ready(() => {
+
+            const display = $("#display");
+            const form = $("#form");
+            const deviceUserInput = $("#deviceUserInput");
+            const typeUserInput = $("#typeUserInput");
+            const numberUserInput = $("#numberUserInput");
+            const message = $("#message");
+            message.hide();
+
+            const displayMessage = (flag, msg) => {
+                // successful
+                if (flag) {
+                    message.removeClass('alert-danger');
+                    message.addClass('alert-success');
+                    message.html(msg);
+                    message.show();
+                } else {
+                    message.removeClass('alert-success');
+                    message.addClass('alert-danger');
+                    message.html(msg);
+                    message.show();
+                }
+            }
+
+            const resetDevicesInput = () => {
+                deviceUserInput.val('');
+            }
+            const resetTypesInput = () => {
+                typeUserInput.val('');
+            }
+            const resetNumbersInput = () => {
+                NumberUserInput.val('');
+            }
+
+            const getTypes = () => {
+                fetch('/getTypes', {
+                    method: "get"
+                }).then((response) => {
+                    return response.json();
+                }).then((data) => {
+                    console.log(data);
+                    displayTypes(data);
+                });
+            }
+
+            getTypes();
+
+
+            const buildTemplate = (type, ids) => {
+
+                return `<li class="list-group-item" id="types">
+                            <div class="row">
+                                <div class="col-md-4" id="${ids}">${type}</div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4 text-right">
+                       
+                              
+                            </div>
+                       </li>`;
+            }
+
+            const displayTypes = (data) => {
+                data.forEach((type) => {
+                    display.append(buildTemplate(type, type));
+
+                });
+            }
+
+
+            form.submit((e) => {
+                e.preventDefault();
+                fetch('/', {
+                    method: 'post',
+                    body: JSON.stringify({
+                        name: deviceUserInput.val(),
+                        type: typeUserInput.val(),
+                        connectedAccount: '',
+                        historyAccounts: [],
+                        loads: [],
+                        timestamp: Date()
+                    }),
+                    headers: {
+                        "Content-Type": "application/json; charset=utf-8"
+                    }
+                }).then((response) => {
+                    return response.json();
+                }).then((data) => {
+                    if (!data.error) {
+                        if (data.result.ok == 1 && data.result.n == 1) {
+                            display.append(buildTemplate(data.document.type, data.document
+                                .type));
+                            displayMessage(true, data.msg);
+                        }
+                    } else
+                        displayMessage(false, data.error.message);
+
+                    resetDevicesInput();
+                    resetTypesInput();
+
+                });
+
+            });
+
+        });
+    </script>
+</body>
+
+</html>
