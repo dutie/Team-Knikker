@@ -1,0 +1,51 @@
+body {
+  overflow: hidden;
+}
+
+.container-fluid {
+  padding-bottom: 50vh;
+  background-image: url('./backgroundPort.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: contrast(135%);
+}
+
+
+.fillUp {
+  margin-top: 20vh;
+}
+
+.container-fluid #main {
+  padding-right: 15%;
+  padding-left: 20%;
+  background-color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+#Tonen {
+  width: 160px;
+  height: 160px;
+  margin-top: 15px;
+}
+
+.container-fluid h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 46px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 25px;
+}
+
+.container-fluid p {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#types {
+  background-color: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bolder;
+  border: 0px;
+  font-size: 27px;
+}

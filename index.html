@@ -11,61 +11,52 @@
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <title>QR Code Application</title>
-
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <canvas id="canvas"></canvas>
+    <div class="container-fluid">
 
-    <div class="container">
         <div class="row">
-            <div class="col-lg-2"></div>
-            <div class="col-lg-8">
-                <form id="form">
+            <div class='col-md-12 fillUp'></div>
+
+            <div class="col-md-3"></div>
+            <div id='main'>
+
+                <form class="col-md-8" id="form">
                     <div class="form-group">
+                        <h1>Create a new device</h1>
                         <p>
-                            <label for="Type">Type</label>
-                            <input type="text" class="form-control" id="typeUserInput" placeholder="Type">
+
+                            <label for="Type">Create a new type</label>
+                            <input name="Type" type="text" class="form-control" id="newTypeUserInput"
+                                placeholder="New type">
+                            <label for="existingType">or choose a type</label>
+                            <select name="existingType" class="form-control" id="typeUserInput">
+                                <option value="existing types" name="type">Existing devices</option>
+                            </select>
                         </p>
                         <p>
                             <label for="device">Device</label>
-                            <input type="text" class="form-control" id="deviceUserInput" placeholder="Device">
+                            <input type="text" class="form-control" id="deviceUserInput" placeholder="Device name">
                         </p>
-                        <p>
-                            <label for="number">Number of new devices</label>
-                            <input type="number" min="0" class="form-control" id="numberUserInput" placeholder="Number">
-                        </p>
+
                     </div>
 
                     <button type="submit" class="btn btn-primary">Create new device</button>
                 </form>
+
             </div>
-            <div class="col-lg-2"></div>
-        </div>
-        <div class="row">
-            <div class="col-lg-2"></div>
-            <div class="col-lg-8">
-
-                <h2>Types to choose from:</h2>
-                <ul class="list-group" id="display">
-
-                </ul>
-            </div>
-            <div class="col-lg-2"></div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-lg-2"></div>
-            <div class="col-lg-8">
-                <div class="alert" role="alert" id="message">
-
-                </div>
+            <div class="col-12 alert text-center" role="alert" id="message">
 
             </div>
 
             <div class="col-lg-2"></div>
         </div>
     </div>
+    </div>
+    </div>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -80,14 +71,13 @@
     </script>
 
     <script>
-        
-
         $(document).ready(() => {
 
-            const display = $("#display");
+            const display = $("#typeUserInput");
             const form = $("#form");
             const deviceUserInput = $("#deviceUserInput");
-            const typeUserInput = $("#typeUserInput");
+            let typeUserInput = $("#typeUserInput");
+            const newTypeUserInput = $("#newTypeUserInput");
             const numberUserInput = $("#numberUserInput");
             const message = $("#message");
             message.hide();
@@ -133,15 +123,9 @@
 
             const buildTemplate = (type, ids) => {
 
-                return `<li class="list-group-item" id="types">
-                            <div class="row">
-                                <div class="col-md-4" id="${ids}">${type}</div>
-                                <div class="col-md-4"></div>
-                                <div class="col-md-4 text-right">
-                       
-                              
-                            </div>
-                       </li>`;
+                return `
+                <option value="${ids}" name="type">${type}</option>
+                `;
             }
 
             const displayTypes = (data) => {
@@ -151,15 +135,16 @@
                 });
             }
 
-
             form.submit((e) => {
+                if (typeUserInput.val() == 'existing devices') {
+                    typeUserInput = newTypeUserInput;
+                }
                 e.preventDefault();
                 fetch('/', {
                     method: 'post',
                     body: JSON.stringify({
                         name: deviceUserInput.val(),
                         type: typeUserInput.val(),
-                        connectedAccount: '',
                         historyAccounts: [],
                         loads: [],
                         timestamp: Date()
@@ -176,12 +161,16 @@
                                 .type));
                             displayMessage(true, data.msg);
                         }
-                    } else
+                    } else {
                         displayMessage(false, data.error.message);
-
+                    }
                     resetDevicesInput();
                     resetTypesInput();
 
+
+                }).then(() => {
+
+                    res.sendFile(path.join(__dirname, 'qr.html'));
                 });
 
             });
